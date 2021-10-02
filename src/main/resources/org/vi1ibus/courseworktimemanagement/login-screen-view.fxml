@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane alignment="CENTER" minHeight="150.0" minWidth="400.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.vi1ibus.courseworktimemanagement.AuthenticationScreenController">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" />
+        <ColumnConstraints hgrow="SOMETIMES" />
+        <ColumnConstraints hgrow="SOMETIMES" prefWidth="100.0" />
+      <ColumnConstraints />
+      <ColumnConstraints />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints vgrow="SOMETIMES" />
+        <RowConstraints vgrow="SOMETIMES" />
+        <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+    </rowConstraints>
+    <TextField fx:id="input_login" prefHeight="25.0" prefWidth="202.0" promptText="Login" GridPane.columnSpan="3">
+      <GridPane.margin>
+         <Insets bottom="5.0" top="5.0" />
+      </GridPane.margin></TextField>
+    <PasswordField fx:id="input_password" prefHeight="25.0" prefWidth="202.0" promptText="Password" GridPane.columnSpan="3" GridPane.rowIndex="1">
+      <GridPane.margin>
+         <Insets bottom="5.0" top="5.0" />
+      </GridPane.margin></PasswordField>
+    <Button mnemonicParsing="false" onAction="#onSignInButtonClick" text="Sign in" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+      <GridPane.margin>
+         <Insets bottom="5.0" top="5.0" />
+      </GridPane.margin></Button>
+    <Button mnemonicParsing="false" onAction="#onRegistrationButtonClick" text="Sign up" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+      <GridPane.margin>
+         <Insets bottom="5.0" top="5.0" />
+      </GridPane.margin></Button>
+   <Label fx:id="output_error_message" alignment="CENTER" contentDisplay="CENTER" maxHeight="17.0" maxWidth="341.0" GridPane.columnSpan="3" GridPane.rowIndex="3">
+      <GridPane.margin>
+         <Insets bottom="5.0" top="5.0" />
+      </GridPane.margin></Label>
+   <padding>
+      <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+   </padding>
+</GridPane>

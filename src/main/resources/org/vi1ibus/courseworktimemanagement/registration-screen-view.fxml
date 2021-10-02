@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane alignment="CENTER" minHeight="150.0" minWidth="400.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.vi1ibus.courseworktimemanagement.AuthenticationScreenController">
+    <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="180.0" minWidth="56.0" prefWidth="100.0" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="180.0" minWidth="56.0" prefWidth="56.0" />
+        <ColumnConstraints hgrow="SOMETIMES" prefWidth="100.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints />
+        <RowConstraints vgrow="SOMETIMES" />
+        <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
+    </rowConstraints>
+    <TextField fx:id="input_login" prefHeight="25.0" prefWidth="202.0" promptText="Login" GridPane.columnSpan="3" GridPane.rowIndex="1">
+      <GridPane.margin>
+         <Insets bottom="5.0" />
+      </GridPane.margin></TextField>
+    <PasswordField fx:id="input_password" prefHeight="25.0" prefWidth="202.0" promptText="Password" GridPane.columnSpan="3" GridPane.rowIndex="2">
+      <GridPane.margin>
+         <Insets bottom="5.0" top="5.0" />
+      </GridPane.margin></PasswordField>
+   <PasswordField fx:id="input_retry_password" promptText="Retry password" GridPane.columnSpan="3" GridPane.rowIndex="3">
+      <GridPane.margin>
+         <Insets bottom="5.0" top="5.0" />
+      </GridPane.margin></PasswordField>
+   <TextField fx:id="input_email" promptText="Email" GridPane.columnSpan="3" GridPane.rowIndex="4">
+      <GridPane.margin>
+         <Insets bottom="5.0" top="5.0" />
+      </GridPane.margin></TextField>
+   <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onConfirmRegistrationButtonClick" prefHeight="25.0" prefWidth="89.0" text="Sign up" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER">
+      <GridPane.margin>
+         <Insets top="5.0" />
+      </GridPane.margin></Button>
+   <Label fx:id="output_error_message" alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="344.0" GridPane.columnSpan="3" GridPane.rowIndex="6" />
+   <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onBackButtonClick" prefHeight="25.0" prefWidth="73.0" text="Back" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
+   <padding>
+      <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+   </padding>
+</GridPane>
