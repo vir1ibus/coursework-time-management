@@ -13,14 +13,10 @@ import java.io.IOException;
 public class AuthenticationScreenController {
 
     private static Stage currentStage;
-    private static Integer userID;
+    private static User user;
 
     public static void setCurrentStage(Stage currentStage) {
         AuthenticationScreenController.currentStage = currentStage;
-    }
-
-    public static void setUserID(Integer userID){
-        AuthenticationScreenController.userID = userID;
     }
 
     @FXML
@@ -36,15 +32,10 @@ public class AuthenticationScreenController {
     @FXML
     protected void onSignInButtonClick() {
         try {
-            setUserID(ControllerDatabase.authenticationUser(input_login.getText(), input_password.getText()));
-            if(userID >= 0) {
-                try {
-                    FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("task-list-view.fxml"));
-                    Scene scene = new Scene(fxmlLoader.load());
-                    currentStage.setScene(scene);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            user = ControllerDatabase.authenticationUser(input_login.getText(), input_password.getText());
+            if(user != null) {
+                MainApplication.setUser(user);
+                MainApplication.showTaskLists(currentStage);
             } else {
                 output_error_message.setText("Wrong login or password.");
             }
@@ -56,9 +47,9 @@ public class AuthenticationScreenController {
 
     @FXML
     protected void onRegistrationButtonClick() throws IOException {
-            FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("registration-screen-view.fxml"));
-            Scene scene = new Scene(fxmlLoader.load());
-            currentStage.setScene(scene);
+        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("registration-screen-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        currentStage.setScene(scene);
     }
 
     @FXML
@@ -71,25 +62,37 @@ public class AuthenticationScreenController {
     @FXML
     protected void onConfirmRegistrationButtonClick() throws IOException {
         if(input_login.getText().length() > 0 && input_password.getText().length() > 0 && input_email.getText().length() > 0) {
-            if (input_password.equals(input_retry_password)) {
-                output_error_message.setText("Passwords do not match.");
-            } else {
-                switch (ControllerDatabase.registrationUser(input_login.getText(), input_password.getText(), input_email.getText())) {
-                    case 0:
-                        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("login-screen-view.fxml"));
-                        Scene scene = new Scene(fxmlLoader.load());
-                        currentStage.setScene(scene);
-                        break;
-                    case 1:
-                        output_error_message.setText("Login already exists.");
-                        break;
-                    case 2:
-                        output_error_message.setText("This email already registered.");
-                        break;
-                    case -1:
-                        output_error_message.setText("Registration unsuccessful.");
-                        break;
+            if(input_login.getText().length() >= 3) {
+                if(input_password.getText().length() > 6) {
+                    if(input_email.getText().length() >= 5 && input_email.getText().contains("@") && input_email.getText().contains(".")){
+                        if (input_password.equals(input_retry_password)) {
+                            output_error_message.setText("Passwords do not match.");
+                        } else {
+                            switch (ControllerDatabase.registrationUser(input_login.getText(), input_password.getText(), input_email.getText())) {
+                                case 0:
+                                    FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("login-screen-view.fxml"));
+                                    Scene scene = new Scene(fxmlLoader.load());
+                                    currentStage.setScene(scene);
+                                    break;
+                                case 1:
+                                    output_error_message.setText("Login already exists.");
+                                    break;
+                                case 2:
+                                    output_error_message.setText("This email already registered.");
+                                    break;
+                                case -1:
+                                    output_error_message.setText("Registration unsuccessful.");
+                                    break;
+                            }
+                        }
+                    } else {
+                        output_error_message.setText("Incorrect email.");
+                    }
+                } else {
+                    output_error_message.setText("Password must be at least 6 characters.");
                 }
+            } else {
+                output_error_message.setText("Login must contain at least 3 characters.");
             }
         } else {
             output_error_message.setText("Some fields are not filled.");
