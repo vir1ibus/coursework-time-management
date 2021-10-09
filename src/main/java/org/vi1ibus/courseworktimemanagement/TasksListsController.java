@@ -1,5 +1,10 @@
 package org.vi1ibus.courseworktimemanagement;
 
-public class TasksListsController {
+import javafx.fxml.FXML;
 
+public class TasksListsController {
+    @FXML
+    public void initialize(){
+
+    }
 }
