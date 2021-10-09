@@ -6,11 +6,80 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class ControllerDatabase {
-    private static final String url="jdbc:mysql://localhost:3306/app?useSSL=true&serverTimezone=UTC";
-    private static final String username="root";
-    private static final String password="root";
+    private static String url="jdbc:mysql://localhost:3306/?useSSL=true&serverTimezone=UTC";
+    private static final String username="vir1ibus";
+    private static final String password="vir1ibus";
     private static Connection connection;
     private static Statement statement;
+
+    public ControllerDatabase(){
+        try {
+            connectDB();
+            statement.executeUpdate("CREATE DATABASE IF NOT EXISTS app;");
+            url = "jdbc:mysql://localhost:3306/app?useSSL=true&serverTimezone=UTC";
+            connection = DriverManager.getConnection(url, username, password);
+            statement = connection.createStatement();
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS `statuses`(" +
+                    "  `id` int NOT NULL," +
+                    "  `name` varchar(45) NOT NULL," +
+                    "  `tasks_list_id` int NOT NULL);");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS `task` (" +
+                    "  `id` int NOT NULL," +
+                    "  `tasks_list_id` int NOT NULL," +
+                    "  `name` varchar(90) NOT NULL," +
+                    "  `description` varchar(500) DEFAULT NULL," +
+                    "  `status` int NOT NULL);");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS `tasks_list` (" +
+                    "  `id` int NOT NULL," +
+                    "  `name` varchar(90) NOT NULL," +
+                    "  `everyone` tinyint(1) NOT NULL DEFAULT '0'," +
+                    "  `owner` int NOT NULL);");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS `tasks_list_has_users` (" +
+                    "  `tasks_list_id` int NOT NULL," +
+                    "  `users_id` int NOT NULL," +
+                    "  `privileges` varchar(10) NOT NULL DEFAULT 'viewer');");
+            statement.executeUpdate("ALTER TABLE `statuses`" +
+                    "  ADD PRIMARY KEY (`id`)," +
+                    "  ADD KEY `fk_statuses_tasks_list1_idx` (`tasks_list_id`); " +
+                    "ALTER TABLE `task`" +
+                    "  ADD PRIMARY KEY (`id`)," +
+                    "  ADD KEY `fk_task_statuses1_idx` (`status`)," +
+                    "  ADD KEY `fk_task_tasks_list1_idx` (`tasks_list_id`); " +
+                    "ALTER TABLE `tasks_list`" +
+                    "  ADD PRIMARY KEY (`id`)," +
+                    "  ADD KEY `owner` (`owner`); " +
+                    "ALTER TABLE `tasks_list_has_users`" +
+                    "  ADD PRIMARY KEY (`tasks_list_id`,`users_id`)," +
+                    "  ADD KEY `fk_tasks_list_has_users_users1_idx` (`users_id`)," +
+                    "  ADD KEY `fk_tasks_list_has_users_tasks_list_idx` (`tasks_list_id`); " +
+                    "ALTER TABLE `users`" +
+                    "  ADD PRIMARY KEY (`id`)," +
+                    "  ADD UNIQUE KEY `login_UNIQUE` (`login`)," +
+                    "  ADD UNIQUE KEY `email_UNIQUE` (`email`);");
+            statement.executeUpdate("ALTER TABLE `statuses`" +
+                    "  MODIFY `id` int NOT NULL AUTO_INCREMENT; " +
+                    "ALTER TABLE `task`" +
+                    "  MODIFY `id` int NOT NULL AUTO_INCREMENT; " +
+                    "ALTER TABLE `tasks_list`\n" +
+                    "  MODIFY `id` int NOT NULL AUTO_INCREMENT; " +
+                    "ALTER TABLE `users`\n" +
+                    "  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;");
+            statement.executeUpdate(
+                    "ALTER TABLE `statuses`" +
+                    "  ADD CONSTRAINT `fk_statuses_tasks_list1` FOREIGN KEY (`tasks_list_id`) REFERENCES `tasks_list` (`id`); " +
+                    "ALTER TABLE `task`" +
+                    "  ADD CONSTRAINT `fk_task_statuses1` FOREIGN KEY (`status`) REFERENCES `statuses` (`id`),\n" +
+                    "  ADD CONSTRAINT `fk_task_tasks_list1` FOREIGN KEY (`tasks_list_id`) REFERENCES `tasks_list` (`id`); " +
+                    "ALTER TABLE `tasks_list`" +
+                    "  ADD CONSTRAINT `tasks_list_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `users` (`id`); " +
+                    "ALTER TABLE `tasks_list_has_users`" +
+                    "  ADD CONSTRAINT `fk_tasks_list_has_users_tasks_list` FOREIGN KEY (`tasks_list_id`) REFERENCES `tasks_list` (`id`),\n" +
+                    "  ADD CONSTRAINT `fk_tasks_list_has_users_users1` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`);"
+            );
+        } catch (SQLException | ClassNotFoundException e){
+            return;
+        }
+    }
 
     public static void connectDB() throws ClassNotFoundException, SQLException {
         Class.forName("com.mysql.cj.jdbc.Driver");
@@ -27,6 +96,7 @@ public class ControllerDatabase {
             int id = Integer.parseInt(resultSet.getString(1));
             return new User(Integer.parseInt(resultSet.getString(1)), resultSet.getString(2), resultSet.getString(4));
         } catch (SQLException | ClassNotFoundException e){
+            e.printStackTrace();
             return null;
         }
     }
@@ -39,13 +109,16 @@ public class ControllerDatabase {
             return 0;
         } catch (SQLIntegrityConstraintViolationException e){
             if(e.toString().contains("login")){
+                e.printStackTrace();
                 return 1;
             }
             if(e.toString().contains("email")){
+                e.printStackTrace();
                 return 2;
             }
             return -1;
         } catch (SQLException | ClassNotFoundException e){
+            e.printStackTrace();
             return -1;
         }
     }
