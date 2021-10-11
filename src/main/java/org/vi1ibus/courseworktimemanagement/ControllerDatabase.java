@@ -1,28 +1,31 @@
 package org.vi1ibus.courseworktimemanagement;
 
+import javafx.collections.ObservableList;
 import javafx.util.Pair;
 
 import java.sql.*;
 import java.util.ArrayList;
 
 public class ControllerDatabase {
-    private static String url="jdbc:mysql://localhost:3306/?useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    private static String url="jdbc:mysql://localhost:3306/app?useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     private static final String username="root";
     private static final String password="root";
     private static Connection connection;
     private static PreparedStatement statement;
 
-    public int checkExistsDB(){
+    /*public static boolean checkExistsDB(){
         try {
             connectDB();
             Statement statement = connection.createStatement();
             statement.executeUpdate("CREATE DATABASE IF NOT EXISTS app;");
             url = "jdbc:mysql://localhost:3306/app?useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true";
             connection = DriverManager.getConnection(url, username, password);
+            statement = connection.createStatement();
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS `statuses`(" +
                     "  `id` int NOT NULL," +
                     "  `name` varchar(45) NOT NULL," +
                     "  `tasks_list_id` int NOT NULL);");
+            System.out.println(1);
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS `task` (" +
                     "  `id` int NOT NULL," +
                     "  `tasks_list_id` int NOT NULL," +
@@ -66,21 +69,22 @@ public class ControllerDatabase {
                     "  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;");
             statement.executeUpdate(
                     "ALTER TABLE `statuses`" +
-                    "  ADD CONSTRAINT `fk_statuses_tasks_list1` FOREIGN KEY (`tasks_list_id`) REFERENCES `tasks_list` (`id`); " +
+                    " ADD CONSTRAINT `fk_statuses_tasks_list1` FOREIGN KEY (`tasks_list_id`) REFERENCES `tasks_list` (`id`); " +
                     "ALTER TABLE `task`" +
-                    "  ADD CONSTRAINT `fk_task_statuses1` FOREIGN KEY (`status`) REFERENCES `statuses` (`id`),\n" +
-                    "  ADD CONSTRAINT `fk_task_tasks_list1` FOREIGN KEY (`tasks_list_id`) REFERENCES `tasks_list` (`id`); " +
+                    " ADD CONSTRAINT `fk_task_statuses1` FOREIGN KEY (`status`) REFERENCES `statuses` (`id`),\n" +
+                    " ADD CONSTRAINT `fk_task_tasks_list1` FOREIGN KEY (`tasks_list_id`) REFERENCES `tasks_list` (`id`); " +
                     "ALTER TABLE `tasks_list`" +
-                    "  ADD CONSTRAINT `tasks_list_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `users` (`id`); " +
+                    " ADD CONSTRAINT `tasks_list_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `users` (`id`); " +
                     "ALTER TABLE `tasks_list_has_users`" +
-                    "  ADD CONSTRAINT `fk_tasks_list_has_users_tasks_list` FOREIGN KEY (`tasks_list_id`) REFERENCES `tasks_list` (`id`),\n" +
-                    "  ADD CONSTRAINT `fk_tasks_list_has_users_users1` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`);"
+                    " ADD CONSTRAINT `fk_tasks_list_has_users_tasks_list` FOREIGN KEY (`tasks_list_id`) REFERENCES `tasks_list` (`id`),\n" +
+                    " ADD CONSTRAINT `fk_tasks_list_has_users_users1` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`);"
             );
-            return 0;
+            return true;
         } catch (SQLException | ClassNotFoundException e){
-            return -1;
+            e.printStackTrace();
+            return false;
         }
-    }
+    } */
 
     public static void connectDB() throws ClassNotFoundException, SQLException {
         Class.forName("com.mysql.cj.jdbc.Driver");
@@ -98,7 +102,6 @@ public class ControllerDatabase {
             resultSet.next();
             return new User(Integer.parseInt(resultSet.getString(1)), resultSet.getString(2), resultSet.getString(4));
         } catch (SQLException | ClassNotFoundException e){
-            e.printStackTrace();
             return null;
         }
     }
@@ -115,47 +118,15 @@ public class ControllerDatabase {
             return 0;
         } catch (SQLIntegrityConstraintViolationException e){
             if(e.toString().contains("login")){
-                e.printStackTrace();
                 return 1;
             }
             if(e.toString().contains("email")){
-                e.printStackTrace();
                 return 2;
             }
             return -1;
         } catch (SQLException | ClassNotFoundException e){
             e.printStackTrace();
             return -1;
-        }
-    }
-
-    public static boolean checkExistenceUserLogin(String login){
-        try {
-            connectDB();
-            String query = "SELECT * from users WHERE login=?;";
-            statement = connection.prepareStatement(query);
-            statement.setString(1, login);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            resultSet.getString(1);
-            return true;
-        } catch (SQLException | ClassNotFoundException e){
-            return false;
-        }
-    }
-
-    public static boolean checkExistenceUserEmail(String email){
-        try {
-            connectDB();
-            String query = "SELECT * from users WHERE email=?;";
-            statement = connection.prepareStatement(query);
-            statement.setString(1, email);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            resultSet.getString(1);
-            return true;
-        } catch (SQLException | ClassNotFoundException e){
-            return false;
         }
     }
 
@@ -173,6 +144,28 @@ public class ControllerDatabase {
         }
     }
 
+    public static ArrayList<TaskList> getTasksLists(int userId){
+        try {
+            connectDB();
+            ArrayList<TaskList> tasksLists = new ArrayList<>();
+            String query = "SELECT * FROM tasks_list WHERE owner=?;";
+            statement = connection.prepareStatement(query);
+            statement.setInt(1, userId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                tasksLists.add(new TaskList(
+                        resultSet.getInt(1),
+                        resultSet.getString(2),
+                        resultSet.getInt(3),
+                        resultSet.getInt(4)
+                ));
+            }
+            return tasksLists;
+        } catch (SQLException | ClassNotFoundException e){
+            return null;
+        }
+    }
+
     public static TaskList getTaskList(int taskListId){
         try {
             connectDB();
@@ -181,10 +174,10 @@ public class ControllerDatabase {
             statement.setInt(1, taskListId);
             ResultSet resultSet = statement.executeQuery();
             return new TaskList(
-                    Integer.parseInt(resultSet.getString(1)),
+                    resultSet.getInt(1),
                     resultSet.getString(2),
-                    Integer.parseInt(resultSet.getString(3)),
-                    Integer.parseInt(resultSet.getString(4))
+                    resultSet.getInt(3),
+                    resultSet.getInt(4)
             );
 
         } catch (SQLException | ClassNotFoundException e){
@@ -198,18 +191,19 @@ public class ControllerDatabase {
             String query = "SELECT id, name FROM statuses WHERE tasks_list_id=?;";
             statement = connection.prepareStatement(query);
             statement.setInt(1, taskListId);
-            ResultSet resultSetNames = statement.executeQuery();
+            ResultSet resultStatusNames = statement.executeQuery();
             ArrayList<Pair<String, Integer>> arrayList = new ArrayList<>();
-            while (resultSetNames.next()){
-                query = "SELECT count(*) FROM task WHERE tasks_list_id=? AND status=?;";
+            while (resultStatusNames.next()){
+                query = "SELECT COUNT(*) FROM task WHERE tasks_list_id=? AND status=?;";
                 statement = connection.prepareStatement(query);
                 statement.setInt(1, taskListId);
-                statement.setString(1, resultSetNames.getString(1) ); // FIX
-                ResultSet resultSetCount = statement.executeQuery();
-                arrayList.add(new Pair<>(resultSetNames.getString(2), Integer.parseInt(resultSetCount.getString(1))));
+                statement.setInt(2, resultStatusNames.getInt(1)); // FIX
+                ResultSet resultStatusCount = statement.executeQuery();
+                arrayList.add(new Pair<>(resultStatusNames.getString(2), resultStatusCount.getInt(1)));
             }
             return arrayList;
         } catch (SQLException | ClassNotFoundException e){
+            e.printStackTrace();
             return null;
         }
     }

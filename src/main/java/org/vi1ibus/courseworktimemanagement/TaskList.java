@@ -6,11 +6,12 @@ public class TaskList {
     private int everyone;
     private int owner;
 
-    public TaskList(int id, String name, int owner, int everyone){
+    public TaskList(int id, String name, int everyone, int owner){
         this.id = id;
         this.name = name;
-        this.owner = owner;
         this.everyone = everyone;
+        this.owner = owner;
+
     }
 
     public int getId() { return id; }

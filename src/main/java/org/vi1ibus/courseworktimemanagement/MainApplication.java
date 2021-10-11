@@ -17,25 +17,20 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         MainApplication.stage = stage;
-        ControllerDatabase controllerDatabase = new ControllerDatabase();
-        controllerDatabase.checkExistsDB();
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("login-screen-view.fxml"));
         stage.setScene(new Scene(fxmlLoader.load()));
         stage.show();
     }
 
-    public static void setUser(User user) {
-        MainApplication.user = user;
-    }
+    public static void setTaskLists(ArrayList<TaskList> taskLists) { MainApplication.taskLists = taskLists; }
+
+    public static ArrayList<TaskList> getTaskLists() { return taskLists; }
+
+    public static void setUser(User user) { MainApplication.user = user; }
 
     public static User getUser() { return user; }
 
-    public static void setStage(Stage stage) {
-        MainApplication.stage = stage;
-    }
-
     public static Stage getStage() { return stage; }
-
 
     public static void main(String[] args) {
         launch(args);
