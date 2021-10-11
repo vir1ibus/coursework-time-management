@@ -13,7 +13,7 @@ public class ControllerDatabase {
     private static Connection connection;
     private static PreparedStatement statement;
 
-    /*public static boolean checkExistsDB(){
+    /* public static boolean checkExistsDB(){
         try {
             connectDB();
             Statement statement = connection.createStatement();
@@ -87,7 +87,6 @@ public class ControllerDatabase {
     } */
 
     public static void connectDB() throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
         connection= DriverManager.getConnection(url, username, password);
     }
 
@@ -125,7 +124,6 @@ public class ControllerDatabase {
             }
             return -1;
         } catch (SQLException | ClassNotFoundException e){
-            e.printStackTrace();
             return -1;
         }
     }
@@ -197,8 +195,9 @@ public class ControllerDatabase {
                 query = "SELECT COUNT(*) FROM task WHERE tasks_list_id=? AND status=?;";
                 statement = connection.prepareStatement(query);
                 statement.setInt(1, taskListId);
-                statement.setInt(2, resultStatusNames.getInt(1)); // FIX
+                statement.setInt(2, resultStatusNames.getInt(1));
                 ResultSet resultStatusCount = statement.executeQuery();
+                resultStatusCount.next();
                 arrayList.add(new Pair<>(resultStatusNames.getString(2), resultStatusCount.getInt(1)));
             }
             return arrayList;

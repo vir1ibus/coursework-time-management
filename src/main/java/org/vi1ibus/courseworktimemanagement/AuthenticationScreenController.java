@@ -32,7 +32,6 @@ public class AuthenticationScreenController {
                 output_error_message.setText("Wrong login or password.");
             }
         } catch (NullPointerException | IOException e){
-            e.printStackTrace();
             output_error_message.setText("Some fields are not filled.");
         }
 

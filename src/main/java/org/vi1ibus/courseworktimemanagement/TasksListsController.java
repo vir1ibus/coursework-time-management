@@ -6,7 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -34,10 +34,6 @@ public class TasksListsController {
     public void initialize(){
         loginMenu.setText(MainApplication.getUser().getLogin());
 
-        DatePickerSkin datePickerSkin = new DatePickerSkin(new DatePicker(LocalDate.now()));
-        Node popupContent = datePickerSkin.getPopupContent();
-        leftSide.getChildren().add(popupContent);
-
         MainApplication.setTaskLists(ControllerDatabase.getTasksLists(MainApplication.getUser().getUserID()));
 
         ObservableList<String> tasksLists = FXCollections.observableArrayList();
@@ -52,15 +48,27 @@ public class TasksListsController {
         tasksListsSelectionModel.selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> changed, String oldValue, String newValue) {
+
+                DatePickerSkin datePickerSkin = new DatePickerSkin(new DatePicker(LocalDate.now()));
+                Node popupContent = datePickerSkin.getPopupContent();
+                popupContent.setStyle("-fx-effect: null;");
+                leftSide.getChildren().add(popupContent);
+
                 for(TaskList taskList : MainApplication.getTaskLists()){
                     if(newValue.equals(taskList.getName())){
                         ArrayList<Pair<String, Integer>> statuses = ControllerDatabase.getTaskListStatuses(taskList.getId());
                         for(Pair<String, Integer> status : statuses){
-                            Label name = new Label(status.getKey());
-                            name.setOpaqueInsets(new Insets(0, 2, 0, 0));
+                            Label name = new Label(status.getKey() + ":");
+                            name.setStyle("-fx-padding: 2px;\n" +
+                                          "-fx-border-insets: 2px;\n" +
+                                          "-fx-background-insets: 2px;");
                             Label count = new Label(String.valueOf(status.getValue()));
-                            count.setOpaqueInsets(new Insets(0, 0, 0, 2));
+                            count.setStyle("-fx-padding: 2px;\n" +
+                                           "-fx-border-insets: 2px;\n" +
+                                           "-fx-background-insets: 2px;");
                             HBox hBox = new HBox(name, count);
+                            hBox.setAlignment(Pos.CENTER);
+
                             leftSide.getChildren().add(hBox);
                         }
                     }
