@@ -14,6 +14,13 @@ public class TaskList {
 
     }
 
+    public TaskList(String name, int everyone, int owner){
+        this.name = name;
+        this.everyone = everyone;
+        this.owner = owner;
+
+    }
+
     public int getId() { return id; }
 
     public String getName() { return name; }

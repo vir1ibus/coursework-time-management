@@ -99,7 +99,7 @@ public class ControllerDatabase {
             statement.setString(2, password);
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
-            return new User(Integer.parseInt(resultSet.getString(1)), resultSet.getString(2), resultSet.getString(4));
+            return new User(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(4));
         } catch (SQLException | ClassNotFoundException e){
             return null;
         }
