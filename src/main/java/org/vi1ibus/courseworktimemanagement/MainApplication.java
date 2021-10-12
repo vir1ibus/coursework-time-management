@@ -7,11 +7,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class MainApplication extends Application {
 
-    private static ArrayList<TaskList> taskLists;
     private static User user;
     private static Stage stage;
 
@@ -23,10 +21,6 @@ public class MainApplication extends Application {
         stage.setScene(new Scene(fxmlLoader.load()));
         stage.show();
     }
-
-    public static void setTaskLists(ArrayList<TaskList> taskLists) { MainApplication.taskLists = taskLists; }
-
-    public static ArrayList<TaskList> getTaskLists() { return taskLists; }
 
     public static void setUser(User user) { MainApplication.user = user; }
 

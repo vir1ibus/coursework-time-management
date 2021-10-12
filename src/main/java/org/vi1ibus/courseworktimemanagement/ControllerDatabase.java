@@ -164,6 +164,20 @@ public class ControllerDatabase {
         }
     }
 
+    public static boolean checkDuplicateNameTaskList(int userId, String name){
+        try {
+            connectDB();
+            String query = "SELECT * FROM tasks_list WHERE name=? and owner=?;";
+            statement = connection.prepareStatement(query);
+            statement.setString(1, name);
+            statement.setInt(2, userId);
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.next();
+        } catch (SQLException | ClassNotFoundException e){
+            return false;
+        }
+    }
+
     public static TaskList getTaskList(int taskListId){
         try {
             connectDB();

@@ -18,7 +18,6 @@ public class TaskList {
         this.name = name;
         this.everyone = everyone;
         this.owner = owner;
-
     }
 
     public int getId() { return id; }

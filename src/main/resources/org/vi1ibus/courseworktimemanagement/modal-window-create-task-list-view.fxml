@@ -6,13 +6,14 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.text.Font?>
 
-<FlowPane fx:id="rootPane" alignment="CENTER" columnHalignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="125.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.vi1ibus.courseworktimemanagement.ModalWindowCreateTaskListController">
+<FlowPane fx:id="rootPane" alignment="CENTER" columnHalignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="150.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.vi1ibus.courseworktimemanagement.ModalWindowCreateTaskListController">
    <children>
       <Label alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Name task list" />
       <TextField fx:id="nameTaskList">
          <FlowPane.margin>
-            <Insets bottom="10.0" />
+            <Insets bottom="10.0" top="5.0" />
          </FlowPane.margin>
       </TextField>
       <CheckBox fx:id="everyone" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="Available to everyone" />
@@ -21,5 +22,13 @@
             <Insets top="5.0" />
          </FlowPane.margin>
       </Button>
+      <Label fx:id="errorMessage" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308">
+         <FlowPane.margin>
+            <Insets top="3.0" />
+         </FlowPane.margin>
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
    </children>
 </FlowPane>

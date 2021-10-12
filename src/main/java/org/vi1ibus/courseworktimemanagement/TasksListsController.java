@@ -38,7 +38,11 @@ public class TasksListsController {
     public void initialize(){
         loginMenu.setText(MainApplication.getUser().getLogin());
 
-        updateTaskListListView();
+        try {
+            updateTaskListListView();
+        } catch (NullPointerException e){
+            listViewTasksLists.setItems(FXCollections.observableArrayList());
+        }
 
         MultipleSelectionModel<String> tasksListsSelectionModel = listViewTasksLists.getSelectionModel();
         tasksListsSelectionModel.selectedItemProperty().addListener(new ChangeListener<String>() {
@@ -49,11 +53,10 @@ public class TasksListsController {
 
                 DatePickerSkin datePickerSkin = new DatePickerSkin(new DatePicker(LocalDate.now()));
                 Node popupContent = datePickerSkin.getPopupContent();
-                popupContent.setId("datePickerSkin");
                 popupContent.setStyle("-fx-effect: null;");
                 leftSide.getChildren().add(popupContent);
 
-                for(TaskList taskList : MainApplication.getTaskLists()){
+                for(TaskList taskList : ControllerDatabase.getTasksLists(MainApplication.getUser().getUserID())){ // FIX
                     if(newValue.equals(taskList.getName())){
                         ArrayList<Pair<String, Integer>> statuses = ControllerDatabase.getTaskListStatuses(taskList.getId());
                         for(Pair<String, Integer> status : statuses){
@@ -76,12 +79,13 @@ public class TasksListsController {
         });
     }
 
-    public void updateTaskListListView(){
-        MainApplication.setTaskLists(ControllerDatabase.getTasksLists(MainApplication.getUser().getUserID()));
+
+
+    public void updateTaskListListView() throws NullPointerException{
 
         ObservableList<String> tasksLists = FXCollections.observableArrayList();
 
-        for(TaskList taskList : MainApplication.getTaskLists()){
+        for(TaskList taskList : ControllerDatabase.getTasksLists(MainApplication.getUser().getUserID())){
             tasksLists.add(taskList.getName());
         }
 
