@@ -4,17 +4,24 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
+import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.skin.DatePickerSkin;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
+import javafx.stage.Modality;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Pair;
@@ -22,6 +29,7 @@ import javafx.util.Pair;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class TasksListsController {
 
@@ -33,6 +41,11 @@ public class TasksListsController {
 
     @FXML
     ListView<String> listViewTasksLists;
+
+    @FXML
+    ImageView createTaskList;
+
+    Popup popup;
 
     @FXML
     public void initialize(){
@@ -79,8 +92,6 @@ public class TasksListsController {
         });
     }
 
-
-
     public void updateTaskListListView() throws NullPointerException{
 
         ObservableList<String> tasksLists = FXCollections.observableArrayList();
@@ -93,23 +104,68 @@ public class TasksListsController {
     }
 
     @FXML
-    public void showModalWindowCreateTaskList(){
-        try {
-            Stage stage = new Stage();
-            FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("modal-window-create-task-list-view.fxml"));
-            stage.setResizable(false);
-            stage.setScene(new Scene(fxmlLoader.load()));
-            stage.showAndWait();
-        } catch (IOException e){
-            e.printStackTrace();
-        } finally {
-            updateTaskListListView();
+    public void showPopupWindowCreateTaskList(){
+        if(popup != null){
+            popup.hide();
         }
+        popup = new Popup();
+        FlowPane flowPane = new FlowPane();
+        flowPane.setPrefSize(220, 140);
+        flowPane.setStyle("-fx-background-color: white; " +
+                "-fx-border-color: #5999ff; " +
+                "-fx-border-width: 2; " +
+                "-fx-border-radius: 10; " +
+                "-fx-background-radius: 10;");
+        flowPane.setAlignment(Pos.CENTER);
+        flowPane.setColumnHalignment(HPos.CENTER);
+        flowPane.setOrientation(Orientation.VERTICAL);
+        flowPane.setPadding(new Insets(15));
+        Label name = new Label("Name task list");
+        Label errMessage = new Label();
+        TextField nameTaskList = new TextField();
+        CheckBox everyone = new CheckBox();
+        everyone.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+        everyone.setText("Available to everyone");
+        Button btn = new Button("Create task list");
+        btn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if(ControllerDatabase.checkDuplicateNameTaskList(MainApplication.getUser().getUserID(), nameTaskList.getText())){
+                    errMessage.setText("This name has already been used.");
+                } else if(nameTaskList.getText().isEmpty()) {
+                    errMessage.setText("The task list name field cannot be empty.");
+                } else {
+                    if(everyone.isSelected()) {
+                        ControllerDatabase.createTaskList(new TaskList(
+                                nameTaskList.getText(),
+                                1,
+                                MainApplication.getUser().getUserID()
+                        ));
+                    } else {
+                        ControllerDatabase.createTaskList(new TaskList(
+                                nameTaskList.getText(),
+                                0,
+                                MainApplication.getUser().getUserID()
+                        ));
+                    }
+                    popup.hide();
+                    updateTaskListListView();
+                }
+            }
+        });
+        btn.setTextAlignment(TextAlignment.CENTER);
+        flowPane.getChildren().addAll(name, nameTaskList, everyone, btn, errMessage);
+        popup.getContent().addAll(flowPane);
+        Bounds boundsInScreen = createTaskList.localToScreen(createTaskList.getLayoutBounds());
+        popup.setX(boundsInScreen.getMinX() - 220 / 2 + createTaskList.getFitWidth() / 2);
+        popup.setY(boundsInScreen.getMinY() - 120 - 5);
+        popup.show(MainApplication.getStage());
     }
 
     @FXML
     public void logOut(){
         try {
+            MainApplication.setUser(null);
             FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("login-screen-view.fxml"));
             MainApplication.getStage().setScene(new Scene(fxmlLoader.load()));
         } catch (IOException e){
