@@ -1,8 +1,6 @@
 package org.vi1ibus.courseworktimemanagement;
 
-import javafx.collections.ObservableList;
 import javafx.util.Pair;
-
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -13,9 +11,7 @@ public class ControllerDatabase {
     private static Connection connection;
     private static PreparedStatement statement;
 
-    public static void connectDB() throws ClassNotFoundException, SQLException {
-        connection = DriverManager.getConnection(url, username, password);
-    }
+    public static void connectDB() throws ClassNotFoundException, SQLException { connection = DriverManager.getConnection(url, username, password); }
 
     public static User authenticationUser(String login, String password) {
         try {
@@ -66,6 +62,39 @@ public class ControllerDatabase {
             statement.executeUpdate();
         } catch (SQLException | ClassNotFoundException e){
             return;
+        }
+    }
+
+    public static void deleteOwnerTasksLists(int taskListId){
+        try {
+            connectDB();
+            String query = "SELECT * FROM tasks_list WHERE id=? AND owner=?;";
+            statement = connection.prepareStatement(query);
+            statement.setInt(1, taskListId);
+            statement.setInt(2, MainApplication.getUser().getUserID());
+            if(statement.executeQuery().next()) {
+                query = "SELECT id FROM statuses WHERE tasks_list_id=?";
+                statement = connection.prepareStatement(query);
+                statement.setInt(1, taskListId);
+                ResultSet resultSet = statement.executeQuery();
+                while (resultSet.next()) {
+                    query = "DELETE FROM task WHERE tasks_list_id=? AND status=?;";
+                    statement = connection.prepareStatement(query);
+                    statement.setInt(1, taskListId);
+                    statement.setInt(2, resultSet.getInt(1));
+                    statement.executeUpdate();
+                }
+                query = "DELETE FROM statuses WHERE tasks_list_id=?;";
+                statement = connection.prepareStatement(query);
+                statement.setInt(1, taskListId);
+                statement.executeUpdate();
+                query = "DELETE FROM tasks_list WHERE id=?;";
+                statement = connection.prepareStatement(query);
+                statement.setInt(1, taskListId);
+                statement.executeUpdate();
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 

@@ -40,10 +40,10 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -174,15 +174,20 @@
                         </VBox>
                      </content>
                   </ScrollPane>
-                  <AnchorPane>
+                  <HBox alignment="CENTER_LEFT">
                      <children>
                         <ImageView fx:id="createTaskList" fitHeight="25.0" fitWidth="25.0" onMouseClicked="#showPopupWindowCreateTaskList" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@img/plus.png" />
                            </image>
                         </ImageView>
+                        <ImageView fitHeight="20.0" fitWidth="25.0" onMouseClicked="#deleteTaskList" pickOnBounds="true" preserveRatio="true" HBox.hgrow="SOMETIMES">
+                           <image>
+                              <Image url="@img/minus.png" />
+                           </image>
+                        </ImageView>
                      </children>
-                  </AnchorPane>
+                  </HBox>
                </children>
                <FlowPane.margin>
                   <Insets />

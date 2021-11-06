@@ -42,6 +42,8 @@ public class TasksListsController {
 
     ArrayList<GridPane> gridPanesTaskLists = new ArrayList<>();
 
+    final String[] selected = {""};
+
     @FXML
     public void initialize(){
         loginMenu.setText(MainApplication.getUser().getLogin());
@@ -52,7 +54,6 @@ public class TasksListsController {
     private void updateOwnerTaskListListView() throws NullPointerException{
         MainApplication.setArrayListTasksLists(ControllerDatabase.getOwnerTasksLists(MainApplication.getUser().getUserID()));
         if(MainApplication.getArrayListTasksLists() != null) {
-            final String[] selected = {""};
             listViewTasksLists.getChildren().clear();
             for (TaskList taskList : MainApplication.getArrayListTasksLists()) {
                 GridPane gridPane = new GridPane();
@@ -93,7 +94,7 @@ public class TasksListsController {
                     public void handle(MouseEvent mouseEvent) {
                         if (selected[0].equals(gridPane.getId())) {
                             FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("status-list-view.fxml"));
-                            try {
+                                try {
                                 MainApplication.getStage().setScene(new Scene(fxmlLoader.load()));
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -155,6 +156,16 @@ public class TasksListsController {
                 listViewTasksLists.getChildren().add(gridPane);
                 VBox.setMargin(gridPane, new Insets(2.5, 10, 2.5, 10));
             }
+        }
+    }
+
+    @FXML
+    public void deleteTaskList(){
+        if(!selected[0].equals("")) {
+            ControllerDatabase.deleteOwnerTasksLists(Integer.parseInt(selected[0]));
+            updateOwnerTaskListListView();
+            leftSide.getChildren().clear();
+            selected[0] = "";
         }
     }
 
