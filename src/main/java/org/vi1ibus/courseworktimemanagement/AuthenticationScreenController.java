@@ -6,8 +6,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import java.nio.charset.StandardCharsets;
 
 public class AuthenticationScreenController {
 
@@ -20,11 +23,26 @@ public class AuthenticationScreenController {
     @FXML
     private PasswordField input_password, input_retry_password;
 
+    public String get_SHA_512_SecurePassword(String passwordToHash){
+        String generatedPassword = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
+            byte[] bytes = md.digest(passwordToHash.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for(int i=0; i< bytes.length ;i++){
+                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+            generatedPassword = sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return generatedPassword;
+    }
 
     @FXML
     protected void onSignInButtonClick() {
         try {
-            MainApplication.setUser(ControllerDatabase.authenticationUser(input_login.getText(), input_password.getText()));
+            MainApplication.setUser(ControllerDatabase.authenticationUser(input_login.getText(), get_SHA_512_SecurePassword(input_password.getText())));
             if(MainApplication.getUser() != null) {
                 FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("task-list-view.fxml"));
                 MainApplication.getStage().setScene(new Scene(fxmlLoader.load()));
@@ -59,7 +77,7 @@ public class AuthenticationScreenController {
                         if (input_password.equals(input_retry_password)) {
                             output_error_message.setText("Passwords do not match.");
                         } else {
-                            switch (ControllerDatabase.registrationUser(input_login.getText(), input_password.getText(), input_email.getText())) {
+                            switch (ControllerDatabase.registrationUser(input_login.getText(), get_SHA_512_SecurePassword(input_password.getText()), input_email.getText())) {
                                 case 0:
                                     FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("login-screen-view.fxml"));
                                     MainApplication.getStage().setScene(new Scene(fxmlLoader.load()));

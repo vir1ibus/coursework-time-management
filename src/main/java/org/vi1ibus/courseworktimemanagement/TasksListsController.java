@@ -1,9 +1,5 @@
 package org.vi1ibus.courseworktimemanagement;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -15,21 +11,14 @@ import javafx.scene.control.*;
 import javafx.scene.control.skin.DatePickerSkin;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
+import javafx.scene.layout.*;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Modality;
 import javafx.stage.Popup;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.Pair;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class TasksListsController {
 
@@ -40,82 +29,136 @@ public class TasksListsController {
     MenuButton loginMenu;
 
     @FXML
-    ListView<String> listViewTasksLists;
+    VBox listViewTasksLists;
 
     @FXML
     ImageView createTaskList;
 
     Popup popup;
 
+    ArrayList<GridPane> gridPanesTaskLists = new ArrayList<>();
+
     @FXML
     public void initialize(){
         loginMenu.setText(MainApplication.getUser().getLogin());
-
-        try {
-            updateTaskListListView();
-        } catch (NullPointerException e){
-            listViewTasksLists.setItems(FXCollections.observableArrayList());
-        }
-
-        MultipleSelectionModel<String> tasksListsSelectionModel = listViewTasksLists.getSelectionModel();
-        tasksListsSelectionModel.selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> changed, String oldValue, String newValue) {
-
-                leftSide.getChildren().clear();
-
-                DatePickerSkin datePickerSkin = new DatePickerSkin(new DatePicker(LocalDate.now()));
-                Node popupContent = datePickerSkin.getPopupContent();
-                popupContent.setStyle("-fx-effect: null;");
-                leftSide.getChildren().add(popupContent);
-
-                for(TaskList taskList : ControllerDatabase.getTasksLists(MainApplication.getUser().getUserID())){ // FIX
-                    if(newValue.equals(taskList.getName())){
-                        ArrayList<Pair<String, Integer>> statuses = ControllerDatabase.getTaskListStatuses(taskList.getId());
-                        for(Pair<String, Integer> status : statuses){
-                            Label name = new Label(status.getKey() + ":");
-                            name.setStyle("-fx-padding: 2px;\n" +
-                                          "-fx-border-insets: 2px;\n" +
-                                          "-fx-background-insets: 2px;");
-                            Label count = new Label(String.valueOf(status.getValue()));
-                            count.setStyle("-fx-padding: 2px;\n" +
-                                           "-fx-border-insets: 2px;\n" +
-                                           "-fx-background-insets: 2px;");
-                            HBox hBox = new HBox(name, count);
-                            hBox.setAlignment(Pos.CENTER);
-
-                            leftSide.getChildren().add(hBox);
-                        }
-                    }
-                }
-            }
-        });
+        updateOwnerTaskListListView();
     }
 
-    public void updateTaskListListView() throws NullPointerException{
+    private void updateOwnerTaskListListView() throws NullPointerException{
+        MainApplication.setArrayListTasksLists(ControllerDatabase.getOwnerTasksLists(MainApplication.getUser().getUserID()));
+        if(MainApplication.getArrayListTasksLists() != null) {
+            final String[] selected = {""};
+            listViewTasksLists.getChildren().clear();
+            for (TaskList taskList : MainApplication.getArrayListTasksLists()) {
+                GridPane gridPane = new GridPane();
+                Label labelName = new Label("Name:");
+                gridPane.add(labelName, 0, 0);
+                GridPane.setMargin(labelName, new Insets(5, 2, 5, 0));
+                Label labelTextName = new Label(taskList.getName());
+                gridPane.add(labelTextName, 1, 0);
+                GridPane.setMargin(labelTextName, new Insets(5, 0, 5, 2));
+                Label labelPrivilege = new Label("Privilege:");
+                gridPane.add(labelPrivilege, 2, 0);
+                GridPane.setMargin(labelPrivilege, new Insets(5, 2, 5, 0));
+                Label labelTextPrivilege = new Label("owner");
+                gridPane.add(labelTextPrivilege, 3, 0);
+                GridPane.setMargin(labelTextPrivilege, new Insets(5, 0, 5, 2));
+                ColumnConstraints labelConstraints = new ColumnConstraints();
+                labelConstraints.setHalignment(HPos.RIGHT);
+                labelConstraints.setHgrow(Priority.ALWAYS);
+                ColumnConstraints textConstraints = new ColumnConstraints();
+                textConstraints.setHalignment(HPos.LEFT);
+                textConstraints.setHgrow(Priority.ALWAYS);
+                gridPane.getColumnConstraints().add(labelConstraints);
+                gridPane.getColumnConstraints().add(textConstraints);
+                gridPane.getColumnConstraints().add(labelConstraints);
+                gridPane.getColumnConstraints().add(textConstraints);
+                gridPane.setStyle("-fx-border-color: #5999ff; " +
+                        "-fx-border-width: 2; " +
+                        "-fx-border-radius: 20; " +
+                        "-fx-background-radius: 20;");
+                gridPane.setId(String.valueOf(taskList.getId()));
+                gridPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent mouseEvent) {
+                        if (selected[0].equals(gridPane.getId())) {
+                            FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("status-list-view.fxml"));
+                            try {
+                                MainApplication.getStage().setScene(new Scene(fxmlLoader.load()));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            leftSide.getChildren().clear();
 
-        ObservableList<String> tasksLists = FXCollections.observableArrayList();
+                            DatePickerSkin datePickerSkin = new DatePickerSkin(new DatePicker(LocalDate.now()));
+                            Node popupContent = datePickerSkin.getPopupContent();
+                            popupContent.setStyle("-fx-effect: null;");
+                            leftSide.getChildren().add(popupContent);
 
-        for(TaskList taskList : ControllerDatabase.getTasksLists(MainApplication.getUser().getUserID())){
-            tasksLists.add(taskList.getName());
+                            for (TaskList taskList : ControllerDatabase.getOwnerTasksLists(MainApplication.getUser().getUserID())) {
+                                if (String.valueOf(taskList.getId()).equals(gridPane.getId())) {
+                                    ArrayList<Pair<String, Integer>> statuses = ControllerDatabase.getTaskListStatuses(taskList.getId());
+                                    for (Pair<String, Integer> status : statuses) {
+                                        Label name = new Label(status.getKey() + ":");
+                                        name.setStyle("-fx-padding: 2px;\n" +
+                                                "-fx-border-insets: 2px;\n" +
+                                                "-fx-background-insets: 2px;");
+                                        Label count = new Label(String.valueOf(status.getValue()));
+                                        count.setStyle("-fx-padding: 2px;\n" +
+                                                "-fx-border-insets: 2px;\n" +
+                                                "-fx-background-insets: 2px;");
+                                        HBox hBox = new HBox(name, count);
+                                        hBox.setAlignment(Pos.CENTER);
+                                        leftSide.getChildren().add(hBox);
+                                    }
+                                    break;
+                                }
+                            }
+                            for (GridPane gp : gridPanesTaskLists) {
+                                if (gp.getStyle().contains("-fx-background-color: #5999ff;")) {
+                                    gp.setStyle("-fx-border-color: #5999ff; " +
+                                            "-fx-border-width: 2; " +
+                                            "-fx-border-radius: 20; " +
+                                            "-fx-background-radius: 20;");
+                                    gp.getChildren().get(0).setStyle("-fx-text-fill: black;");
+                                    gp.getChildren().get(1).setStyle("-fx-text-fill: black;");
+                                    gp.getChildren().get(2).setStyle("-fx-text-fill: black;");
+                                    gp.getChildren().get(3).setStyle("-fx-text-fill: black;");
+                                    break;
+                                }
+                            }
+                            labelName.setStyle("-fx-text-fill: white;");
+                            labelTextName.setStyle("-fx-text-fill: white;");
+                            labelPrivilege.setStyle("-fx-text-fill: white;");
+                            labelTextPrivilege.setStyle("-fx-text-fill: white;");
+                            gridPane.setStyle("-fx-border-color: #5999ff; " +
+                                    "-fx-border-width: 2; " +
+                                    "-fx-border-radius: 20; " +
+                                    "-fx-background-radius: 20; " +
+                                    "-fx-background-color: #5999ff;");
+                            selected[0] = gridPane.getId();
+                        }
+                    }
+                });
+                gridPanesTaskLists.add(gridPane);
+                listViewTasksLists.getChildren().add(gridPane);
+                VBox.setMargin(gridPane, new Insets(2.5, 10, 2.5, 10));
+            }
         }
-
-        listViewTasksLists.setItems(tasksLists);
     }
 
     @FXML
     public void showPopupWindowCreateTaskList(){
-        if(popup != null){
-            popup.hide();
-        }
         popup = new Popup();
+        popup.setAutoHide(true);
         FlowPane flowPane = new FlowPane();
         flowPane.setPrefSize(220, 140);
         flowPane.setStyle("-fx-background-color: white; " +
-                "-fx-border-color: #5999ff; " +
-                "-fx-border-width: 2; " +
-                "-fx-border-radius: 10; " +
-                "-fx-background-radius: 10;");
+                          "-fx-border-color: #5999ff; " +
+                          "-fx-border-width: 2; " +
+                          "-fx-border-radius: 10; " +
+                          "-fx-background-radius: 10;");
         flowPane.setAlignment(Pos.CENTER);
         flowPane.setColumnHalignment(HPos.CENTER);
         flowPane.setOrientation(Orientation.VERTICAL);
@@ -149,7 +192,7 @@ public class TasksListsController {
                         ));
                     }
                     popup.hide();
-                    updateTaskListListView();
+                    updateOwnerTaskListListView();
                 }
             }
         });
@@ -157,8 +200,8 @@ public class TasksListsController {
         flowPane.getChildren().addAll(name, nameTaskList, everyone, btn, errMessage);
         popup.getContent().addAll(flowPane);
         Bounds boundsInScreen = createTaskList.localToScreen(createTaskList.getLayoutBounds());
-        popup.setX(boundsInScreen.getMinX() - 220 / 2 + createTaskList.getFitWidth() / 2);
-        popup.setY(boundsInScreen.getMinY() - 120 - 5);
+        popup.setX(boundsInScreen.getMinX() - 110 + createTaskList.getFitWidth() / 2);
+        popup.setY(boundsInScreen.getMinY() - 105);
         popup.show(MainApplication.getStage());
     }
 
