@@ -12,6 +12,7 @@ import javafx.scene.control.skin.DatePickerSkin;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Popup;
 import javafx.util.Pair;
@@ -34,6 +35,9 @@ public class TasksListsController {
     @FXML
     ImageView createTaskList;
 
+    @FXML
+    ToolBar toolBar;
+
     Popup popup;
 
     ArrayList<GridPane> gridPanesTaskLists = new ArrayList<>();
@@ -41,6 +45,7 @@ public class TasksListsController {
     @FXML
     public void initialize(){
         loginMenu.setText(MainApplication.getUser().getLogin());
+        MainApplication.setDraggable(toolBar);
         updateOwnerTaskListListView();
     }
 
@@ -52,15 +57,19 @@ public class TasksListsController {
             for (TaskList taskList : MainApplication.getArrayListTasksLists()) {
                 GridPane gridPane = new GridPane();
                 Label labelName = new Label("Name:");
+                labelName.setStyle("-fx-text-fill: white;");
                 gridPane.add(labelName, 0, 0);
                 GridPane.setMargin(labelName, new Insets(5, 2, 5, 0));
                 Label labelTextName = new Label(taskList.getName());
+                labelTextName.setStyle("-fx-text-fill: white;");
                 gridPane.add(labelTextName, 1, 0);
                 GridPane.setMargin(labelTextName, new Insets(5, 0, 5, 2));
                 Label labelPrivilege = new Label("Privilege:");
+                labelPrivilege.setStyle("-fx-text-fill: white;");
                 gridPane.add(labelPrivilege, 2, 0);
                 GridPane.setMargin(labelPrivilege, new Insets(5, 2, 5, 0));
                 Label labelTextPrivilege = new Label("owner");
+                labelTextPrivilege.setStyle("-fx-text-fill: white;");
                 gridPane.add(labelTextPrivilege, 3, 0);
                 GridPane.setMargin(labelTextPrivilege, new Insets(5, 0, 5, 2));
                 ColumnConstraints labelConstraints = new ColumnConstraints();
@@ -76,7 +85,8 @@ public class TasksListsController {
                 gridPane.setStyle("-fx-border-color: #5999ff; " +
                         "-fx-border-width: 2; " +
                         "-fx-border-radius: 20; " +
-                        "-fx-background-radius: 20;");
+                        "-fx-background-radius: 20; " +
+                        "-fx-background-color: #5999ff;");
                 gridPane.setId(String.valueOf(taskList.getId()));
                 gridPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
@@ -116,27 +126,27 @@ public class TasksListsController {
                                 }
                             }
                             for (GridPane gp : gridPanesTaskLists) {
-                                if (gp.getStyle().contains("-fx-background-color: #5999ff;")) {
+                                if (!gp.getStyle().contains("-fx-background-color: #5999ff;")) {
                                     gp.setStyle("-fx-border-color: #5999ff; " +
                                             "-fx-border-width: 2; " +
                                             "-fx-border-radius: 20; " +
-                                            "-fx-background-radius: 20;");
-                                    gp.getChildren().get(0).setStyle("-fx-text-fill: black;");
-                                    gp.getChildren().get(1).setStyle("-fx-text-fill: black;");
-                                    gp.getChildren().get(2).setStyle("-fx-text-fill: black;");
-                                    gp.getChildren().get(3).setStyle("-fx-text-fill: black;");
+                                            "-fx-background-radius: 20; " +
+                                            "-fx-background-color: #5999ff;");
+                                    gp.getChildren().get(0).setStyle("-fx-text-fill: white;");
+                                    gp.getChildren().get(1).setStyle("-fx-text-fill: white;");
+                                    gp.getChildren().get(2).setStyle("-fx-text-fill: white;");
+                                    gp.getChildren().get(3).setStyle("-fx-text-fill: white;");
                                     break;
                                 }
                             }
-                            labelName.setStyle("-fx-text-fill: white;");
-                            labelTextName.setStyle("-fx-text-fill: white;");
-                            labelPrivilege.setStyle("-fx-text-fill: white;");
-                            labelTextPrivilege.setStyle("-fx-text-fill: white;");
+                            labelName.setStyle("-fx-text-fill: black;");
+                            labelTextName.setStyle("-fx-text-fill: black;");
+                            labelPrivilege.setStyle("-fx-text-fill: black;");
+                            labelTextPrivilege.setStyle("-fx-text-fill: black;");
                             gridPane.setStyle("-fx-border-color: #5999ff; " +
                                     "-fx-border-width: 2; " +
                                     "-fx-border-radius: 20; " +
-                                    "-fx-background-radius: 20; " +
-                                    "-fx-background-color: #5999ff;");
+                                    "-fx-background-radius: 20;");
                             selected[0] = gridPane.getId();
                         }
                     }
@@ -153,22 +163,22 @@ public class TasksListsController {
         popup = new Popup();
         popup.setAutoHide(true);
         FlowPane flowPane = new FlowPane();
-        flowPane.setPrefSize(220, 140);
-        flowPane.setStyle("-fx-background-color: white; " +
-                          "-fx-border-color: #5999ff; " +
-                          "-fx-border-width: 2; " +
-                          "-fx-border-radius: 10; " +
-                          "-fx-background-radius: 10;");
+        flowPane.setPrefSize(210, 140);
+        flowPane.setStyle("-fx-background-color: #5999ff; " +
+                          "-fx-background-radius: 20;");
         flowPane.setAlignment(Pos.CENTER);
         flowPane.setColumnHalignment(HPos.CENTER);
         flowPane.setOrientation(Orientation.VERTICAL);
         flowPane.setPadding(new Insets(15));
         Label name = new Label("Name task list");
+        name.setTextFill(Color.WHITE);
         Label errMessage = new Label();
+        errMessage.setTextFill(Color.WHITE);
         TextField nameTaskList = new TextField();
         CheckBox everyone = new CheckBox();
         everyone.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         everyone.setText("Available to everyone");
+        everyone.setTextFill(Color.WHITE);
         Button btn = new Button("Create task list");
         btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -201,7 +211,7 @@ public class TasksListsController {
         popup.getContent().addAll(flowPane);
         Bounds boundsInScreen = createTaskList.localToScreen(createTaskList.getLayoutBounds());
         popup.setX(boundsInScreen.getMinX() - 110 + createTaskList.getFitWidth() / 2);
-        popup.setY(boundsInScreen.getMinY() - 105);
+        popup.setY(boundsInScreen.getMinY() - 135);
         popup.show(MainApplication.getStage());
     }
 
@@ -210,9 +220,16 @@ public class TasksListsController {
         try {
             MainApplication.setUser(null);
             FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("login-screen-view.fxml"));
-            MainApplication.getStage().setScene(new Scene(fxmlLoader.load()));
+            Scene scene = new Scene(fxmlLoader.load());
+            MainApplication.setDraggable(scene);
+            MainApplication.getStage().setScene(scene);
         } catch (IOException e){
             return;
         }
+    }
+
+    @FXML
+    public void closeWindow(){
+        MainApplication.getStage().close();
     }
 }

@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -59,13 +60,17 @@ public class AuthenticationScreenController {
     @FXML
     protected void onRegistrationButtonClick() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("registration-screen-view.fxml"));
-        MainApplication.getStage().setScene(new Scene(fxmlLoader.load()));
+        Scene scene = new Scene(fxmlLoader.load());
+        MainApplication.setDraggable(scene);
+        MainApplication.getStage().setScene(scene);
     }
 
     @FXML
     protected void onBackButtonClick() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("login-screen-view.fxml"));
-        MainApplication.getStage().setScene(new Scene(fxmlLoader.load()));
+        Scene scene = new Scene(fxmlLoader.load());
+        MainApplication.setDraggable(scene);
+        MainApplication.getStage().setScene(scene);
     }
 
     @FXML
@@ -80,7 +85,9 @@ public class AuthenticationScreenController {
                             switch (ControllerDatabase.registrationUser(input_login.getText(), get_SHA_512_SecurePassword(input_password.getText()), input_email.getText())) {
                                 case 0:
                                     FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("login-screen-view.fxml"));
-                                    MainApplication.getStage().setScene(new Scene(fxmlLoader.load()));
+                                    Scene scene = new Scene(fxmlLoader.load());
+                                    MainApplication.setDraggable(scene);
+                                    MainApplication.getStage().setScene(scene);
                                     break;
                                 case 1:
                                     output_error_message.setText("Login already exists.");
@@ -105,5 +112,10 @@ public class AuthenticationScreenController {
         } else {
             output_error_message.setText("Some fields are not filled.");
         }
+    }
+
+    @FXML
+    public void closeWindow(){
+        MainApplication.getStage().close();
     }
 }
