@@ -15,6 +15,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Popup;
+import javafx.util.Callback;
 import javafx.util.Pair;
 
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class TasksListsController {
     ImageView createTaskList;
 
     @FXML
-    ToolBar toolBar;
+    AnchorPane toolBar;
 
     Popup popup;
 
@@ -52,10 +53,10 @@ public class TasksListsController {
     }
 
     private void updateOwnerTaskListListView() throws NullPointerException{
-        MainApplication.setArrayListTasksLists(ControllerDatabase.getOwnerTasksLists(MainApplication.getUser().getUserID()));
-        if(MainApplication.getArrayListTasksLists() != null) {
+        MainApplication.setCurrentArrayListTasksLists(ControllerDatabase.getOwnerTasksLists(MainApplication.getUser().getUserID()));
+        if(MainApplication.getCurrentArrayListTasksLists() != null) {
             listViewTasksLists.getChildren().clear();
-            for (TaskList taskList : MainApplication.getArrayListTasksLists()) {
+            for (TaskList taskList : MainApplication.getCurrentArrayListTasksLists()) {
                 GridPane gridPane = new GridPane();
                 Label labelName = new Label("Name:");
                 labelName.setStyle("-fx-text-fill: white;");
@@ -100,32 +101,41 @@ public class TasksListsController {
                                 e.printStackTrace();
                             }
                         } else {
+                            for (TaskList taskList : MainApplication.getCurrentArrayListTasksLists()) {
+                                if (String.valueOf(taskList.getId()).equals(gridPane.getId())) {
+                                    MainApplication.setCurrentTaskList(taskList);
+                                    break;
+                                }
+                            }
+
                             leftSide.getChildren().clear();
 
-                            DatePickerSkin datePickerSkin = new DatePickerSkin(new DatePicker(LocalDate.now()));
+                            DatePicker datePicker = new DatePicker(LocalDate.now());
+                            datePicker.setShowWeekNumbers(true);
+                            Callback<DatePicker, DateCell> dayCellFactory= getDayCellFactory();
+                            datePicker.setDayCellFactory(dayCellFactory);
+                            DatePickerSkin datePickerSkin = new DatePickerSkin(datePicker);
                             Node popupContent = datePickerSkin.getPopupContent();
                             popupContent.setStyle("-fx-effect: null;");
                             leftSide.getChildren().add(popupContent);
 
-                            for (TaskList taskList : ControllerDatabase.getOwnerTasksLists(MainApplication.getUser().getUserID())) {
-                                if (String.valueOf(taskList.getId()).equals(gridPane.getId())) {
-                                    ArrayList<Pair<String, Integer>> statuses = ControllerDatabase.getTaskListStatuses(taskList.getId());
-                                    for (Pair<String, Integer> status : statuses) {
-                                        Label name = new Label(status.getKey() + ":");
-                                        name.setStyle("-fx-padding: 2px;\n" +
-                                                "-fx-border-insets: 2px;\n" +
-                                                "-fx-background-insets: 2px;");
-                                        Label count = new Label(String.valueOf(status.getValue()));
-                                        count.setStyle("-fx-padding: 2px;\n" +
-                                                "-fx-border-insets: 2px;\n" +
-                                                "-fx-background-insets: 2px;");
-                                        HBox hBox = new HBox(name, count);
-                                        hBox.setAlignment(Pos.CENTER);
-                                        leftSide.getChildren().add(hBox);
-                                    }
-                                    break;
+                            ArrayList<Pair<String, Integer>> statuses = ControllerDatabase.getCountTaskListStatuses(taskList.getId());
+                            if(!statuses.isEmpty()) {
+                                for (Pair<String, Integer> status : statuses) {
+                                    Label name = new Label(status.getKey() + ":");
+                                    name.setStyle("-fx-padding: 2px;\n" +
+                                            "-fx-border-insets: 2px;\n" +
+                                            "-fx-background-insets: 2px;");
+                                    Label count = new Label(String.valueOf(status.getValue()));
+                                    count.setStyle("-fx-padding: 2px;\n" +
+                                            "-fx-border-insets: 2px;\n" +
+                                            "-fx-background-insets: 2px;");
+                                    HBox hBox = new HBox(name, count);
+                                    hBox.setAlignment(Pos.CENTER);
+                                    leftSide.getChildren().add(hBox);
                                 }
                             }
+
                             for (GridPane gp : gridPanesTaskLists) {
                                 if (!gp.getStyle().contains("-fx-background-color: #5999ff;")) {
                                     gp.setStyle("-fx-border-color: #5999ff; " +
@@ -157,6 +167,29 @@ public class TasksListsController {
                 VBox.setMargin(gridPane, new Insets(2.5, 10, 2.5, 10));
             }
         }
+    }
+
+    private Callback<DatePicker, DateCell> getDayCellFactory() {
+        final Callback<DatePicker, DateCell> dayCellFactory = new Callback<DatePicker, DateCell>() {
+            @Override
+            public DateCell call(final DatePicker datePicker) {
+                return new DateCell() {
+                    @Override
+                    public void updateItem(LocalDate item, boolean empty) {
+                        super.updateItem(item, empty);
+                        LocalDate start = MainApplication.getCurrentTaskList().getStart();
+                        LocalDate end = MainApplication.getCurrentTaskList().getEnd();
+                        if((start.isBefore(item) && end.isAfter(item)) || start.equals(item) || end.equals(item)) {
+                            setStyle(getStyle() + " -fx-text-fill: white; -fx-background-color: #5999ff;");
+                        }
+                        if(item.equals(LocalDate.now())) {
+                            setStyle(getStyle() + " -fx-text-fill: white; -fx-background-color: red;");
+                        }
+                    }
+                };
+            }
+        };
+        return dayCellFactory;
     }
 
     @FXML
@@ -194,9 +227,7 @@ public class TasksListsController {
         btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                if(ControllerDatabase.checkDuplicateNameTaskList(MainApplication.getUser().getUserID(), nameTaskList.getText())){
-                    errMessage.setText("This name has already been used.");
-                } else if(nameTaskList.getText().isEmpty()) {
+                if(nameTaskList.getText().isEmpty()) {
                     errMessage.setText("The task list name field cannot be empty.");
                 } else {
                     if(everyone.isSelected()) {

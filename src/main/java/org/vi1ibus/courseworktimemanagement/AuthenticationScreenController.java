@@ -1,13 +1,17 @@
 package org.vi1ibus.courseworktimemanagement;
 
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import java.io.IOException;
+import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -24,16 +28,16 @@ public class AuthenticationScreenController {
     @FXML
     private PasswordField input_password, input_retry_password;
 
-    public String get_SHA_512_SecurePassword(String passwordToHash){
+    public String get_SHA_512_SecurePassword(String password){
         String generatedPassword = null;
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-512");
-            byte[] bytes = md.digest(passwordToHash.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
+            byte[] bytes = md.digest(password.getBytes(StandardCharsets.UTF_8));
+            StringBuilder stringBuilder = new StringBuilder();
             for(int i=0; i< bytes.length ;i++){
-                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+                stringBuilder.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
             }
-            generatedPassword = sb.toString();
+            generatedPassword = stringBuilder.toString();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -58,11 +62,16 @@ public class AuthenticationScreenController {
     }
 
     @FXML
-    protected void onRegistrationButtonClick() throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("registration-screen-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
-        MainApplication.setDraggable(scene);
-        MainApplication.getStage().setScene(scene);
+    protected void onRegistrationButtonClick() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("registration-screen-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+            MainApplication.setDraggable(scene);
+            MainApplication.getStage().setScene(scene);
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+
     }
 
     @FXML

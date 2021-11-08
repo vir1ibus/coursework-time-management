@@ -3,6 +3,7 @@ package org.vi1ibus.courseworktimemanagement;
 import javafx.util.Pair;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ControllerDatabase {
     private static String url="jdbc:mysql://localhost:3306/app?useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true";
@@ -78,7 +79,7 @@ public class ControllerDatabase {
                 statement.setInt(1, taskListId);
                 ResultSet resultSet = statement.executeQuery();
                 while (resultSet.next()) {
-                    query = "DELETE FROM task WHERE tasks_list_id=? AND status=?;";
+                    query = "DELETE FROM task WHERE tasks_list_id=? AND status_id=?;";
                     statement = connection.prepareStatement(query);
                     statement.setInt(1, taskListId);
                     statement.setInt(2, resultSet.getInt(1));
@@ -120,20 +121,6 @@ public class ControllerDatabase {
         }
     }
 
-    public static boolean checkDuplicateNameTaskList(int userId, String name){
-        try {
-            connectDB();
-            String query = "SELECT * FROM tasks_list WHERE name=? and owner=?;";
-            statement = connection.prepareStatement(query);
-            statement.setString(1, name);
-            statement.setInt(2, userId);
-            ResultSet resultSet = statement.executeQuery();
-            return resultSet.next();
-        } catch (SQLException | ClassNotFoundException e){
-            return false;
-        }
-    }
-
     public static TaskList getTaskList(int taskListId){
         try {
             connectDB();
@@ -153,7 +140,63 @@ public class ControllerDatabase {
         }
     }
 
-    public static ArrayList<Pair<String, Integer>> getTaskListStatuses(int taskListId) {
+    public static HashMap<String, String> getStatuses(int taskListId){
+        try {
+            connectDB();
+            HashMap<String, String> hashMap = new HashMap<>();
+            String query = "SELECT * FROM statuses WHERE tasks_list_id=?;";
+            statement = connection.prepareStatement(query);
+            statement.setInt(1, taskListId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                hashMap.put(String.valueOf(resultSet.getInt(1)), resultSet.getString(2));
+            }
+            return hashMap;
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static void createStatus(String name){
+        try {
+            connectDB();
+            String query = "INSERT INTO statuses(name, tasks_list_id) VALUES (?, ?);";
+            statement = connection.prepareStatement(query);
+            statement.setString(1, name);
+            statement.setInt(2, MainApplication.getCurrentTaskList().getId());
+            statement.executeUpdate();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static HashMap<String, Task> getTasksByStatus(String status){
+        try {
+            connectDB();
+            HashMap<String, Task> hashMap = new HashMap<>();
+            String query = "SELECT * FROM task WHERE status_id=? AND tasks_list_id=?";
+            statement = connection.prepareStatement(query);
+            statement.setInt(1, Integer.parseInt(status));
+            statement.setInt(2, MainApplication.getCurrentTaskList().getId());
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                hashMap.put(String.valueOf(resultSet.getInt(1)),
+                            new Task(resultSet.getInt(1),
+                                     resultSet.getInt(2),
+                                     resultSet.getString(3),
+                                     resultSet.getString(4),
+                                     resultSet.getInt(5)
+                            ));
+            }
+            return hashMap;
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static ArrayList<Pair<String, Integer>> getCountTaskListStatuses(int taskListId) {
         try {
             connectDB();
             String query = "SELECT id, name FROM statuses WHERE tasks_list_id=?;";
@@ -162,7 +205,7 @@ public class ControllerDatabase {
             ResultSet resultStatusNames = statement.executeQuery();
             ArrayList<Pair<String, Integer>> arrayList = new ArrayList<>();
             while (resultStatusNames.next()){
-                query = "SELECT COUNT(*) FROM task WHERE tasks_list_id=? AND status=?;";
+                query = "SELECT COUNT(*) FROM task WHERE tasks_list_id=? AND status_id=?;";
                 statement = connection.prepareStatement(query);
                 statement.setInt(1, taskListId);
                 statement.setInt(2, resultStatusNames.getInt(1));
@@ -177,6 +220,19 @@ public class ControllerDatabase {
         }
     }
 
-
+    public static void createTask(int taskListId, String name, String description, int statusId){
+        try {
+            connectDB();
+            String query = "INSERT INTO task(tasks_list_id, name, description, status_id) VALUES (?, ?, ?, ?);";
+            statement = connection.prepareStatement(query);
+            statement.setInt(1, taskListId);
+            statement.setString(2, name);
+            statement.setString(3, description);
+            statement.setInt(4, statusId);
+            statement.executeUpdate();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
