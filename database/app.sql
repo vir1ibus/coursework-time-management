@@ -2,10 +2,10 @@
 -- version 5.1.0
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3306
--- Generation Time: Oct 03, 2021 at 05:46 PM
--- Server version: 8.0.24
--- PHP Version: 7.1.33
+-- Хост: 127.0.0.1:3306
+-- Время создания: Дек 02 2021 г., 18:43
+-- Версия сервера: 8.0.24
+-- Версия PHP: 8.0.8
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `app`
+-- База данных: `app`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `statuses`
+-- Структура таблицы `statuses`
 --
 
 CREATE TABLE `statuses` (
@@ -33,10 +33,23 @@ CREATE TABLE `statuses` (
   `tasks_list_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Дамп данных таблицы `statuses`
+--
+
+INSERT INTO `statuses` (`id`, `name`, `tasks_list_id`) VALUES
+(5, 'Test\n', 43),
+(8, 'Test_2\n', 43),
+(9, 'test_3\n', 43),
+(10, 'test_4\n', 43),
+(11, 'Test_5\n', 43),
+(12, 'te\n', 43),
+(13, 'dfy\n', 43);
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `task`
+-- Структура таблицы `task`
 --
 
 CREATE TABLE `task` (
@@ -44,13 +57,20 @@ CREATE TABLE `task` (
   `tasks_list_id` int NOT NULL,
   `name` varchar(90) NOT NULL,
   `description` varchar(500) DEFAULT NULL,
-  `status` int NOT NULL
+  `status_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `task`
+--
+
+INSERT INTO `task` (`id`, `tasks_list_id`, `name`, `description`, `status_id`) VALUES
+(1, 43, 'Test', 'Test', 11);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tasks_list`
+-- Структура таблицы `tasks_list`
 --
 
 CREATE TABLE `tasks_list` (
@@ -60,10 +80,17 @@ CREATE TABLE `tasks_list` (
   `owner` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Дамп данных таблицы `tasks_list`
+--
+
+INSERT INTO `tasks_list` (`id`, `name`, `everyone`, `owner`) VALUES
+(43, 'test', 1, 0);
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tasks_list_has_users`
+-- Структура таблицы `tasks_list_has_users`
 --
 
 CREATE TABLE `tasks_list_has_users` (
@@ -75,53 +102,51 @@ CREATE TABLE `tasks_list_has_users` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Структура таблицы `users`
 --
 
 CREATE TABLE `users` (
   `id` int NOT NULL,
   `login` varchar(45) NOT NULL,
-  `password` varchar(45) NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `email` varchar(45) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data for table `users`
+-- Дамп данных таблицы `users`
 --
 
 INSERT INTO `users` (`id`, `login`, `password`, `email`) VALUES
-(1, 'root', 'root', '-'),
-(2, 'vir1ibus', '123456', 'aaa@gmail.com'),
-(13, 'vir1ibus_1', '1234567', 'aa@aa.aa');
+(0, 'root', '99adc231b045331e514a516b4b7680f588e3823213abe901738bc3ad67b2f6fcb3c64efb93d18002588d3ccc1a49efbae1ce20cb43df36b38651f11fa75678e8', '');
 
 --
--- Indexes for dumped tables
+-- Индексы сохранённых таблиц
 --
 
 --
--- Indexes for table `statuses`
+-- Индексы таблицы `statuses`
 --
 ALTER TABLE `statuses`
   ADD PRIMARY KEY (`id`),
   ADD KEY `fk_statuses_tasks_list1_idx` (`tasks_list_id`);
 
 --
--- Indexes for table `task`
+-- Индексы таблицы `task`
 --
 ALTER TABLE `task`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_task_statuses1_idx` (`status`),
+  ADD KEY `fk_task_statuses1_idx` (`status_id`),
   ADD KEY `fk_task_tasks_list1_idx` (`tasks_list_id`);
 
 --
--- Indexes for table `tasks_list`
+-- Индексы таблицы `tasks_list`
 --
 ALTER TABLE `tasks_list`
   ADD PRIMARY KEY (`id`),
   ADD KEY `owner` (`owner`);
 
 --
--- Indexes for table `tasks_list_has_users`
+-- Индексы таблицы `tasks_list_has_users`
 --
 ALTER TABLE `tasks_list_has_users`
   ADD PRIMARY KEY (`tasks_list_id`,`users_id`),
@@ -129,7 +154,7 @@ ALTER TABLE `tasks_list_has_users`
   ADD KEY `fk_tasks_list_has_users_tasks_list_idx` (`tasks_list_id`);
 
 --
--- Indexes for table `users`
+-- Индексы таблицы `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
@@ -137,58 +162,58 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `email_UNIQUE` (`email`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT для сохранённых таблиц
 --
 
 --
--- AUTO_INCREMENT for table `statuses`
+-- AUTO_INCREMENT для таблицы `statuses`
 --
 ALTER TABLE `statuses`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `task`
---
-ALTER TABLE `task`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `tasks_list`
---
-ALTER TABLE `tasks_list`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
--- Constraints for dumped tables
+-- AUTO_INCREMENT для таблицы `task`
+--
+ALTER TABLE `task`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT для таблицы `tasks_list`
+--
+ALTER TABLE `tasks_list`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+
+--
+-- AUTO_INCREMENT для таблицы `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
+-- Ограничения внешнего ключа сохраненных таблиц
 --
 
 --
--- Constraints for table `statuses`
+-- Ограничения внешнего ключа таблицы `statuses`
 --
 ALTER TABLE `statuses`
   ADD CONSTRAINT `fk_statuses_tasks_list1` FOREIGN KEY (`tasks_list_id`) REFERENCES `tasks_list` (`id`);
 
 --
--- Constraints for table `task`
+-- Ограничения внешнего ключа таблицы `task`
 --
 ALTER TABLE `task`
-  ADD CONSTRAINT `fk_task_statuses1` FOREIGN KEY (`status`) REFERENCES `statuses` (`id`),
+  ADD CONSTRAINT `fk_task_statuses1` FOREIGN KEY (`status_id`) REFERENCES `statuses` (`id`),
   ADD CONSTRAINT `fk_task_tasks_list1` FOREIGN KEY (`tasks_list_id`) REFERENCES `tasks_list` (`id`);
 
 --
--- Constraints for table `tasks_list`
+-- Ограничения внешнего ключа таблицы `tasks_list`
 --
 ALTER TABLE `tasks_list`
   ADD CONSTRAINT `tasks_list_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `users` (`id`);
 
 --
--- Constraints for table `tasks_list_has_users`
+-- Ограничения внешнего ключа таблицы `tasks_list_has_users`
 --
 ALTER TABLE `tasks_list_has_users`
   ADD CONSTRAINT `fk_tasks_list_has_users_tasks_list` FOREIGN KEY (`tasks_list_id`) REFERENCES `tasks_list` (`id`),
