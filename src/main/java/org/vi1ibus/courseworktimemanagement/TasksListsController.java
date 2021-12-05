@@ -52,7 +52,7 @@ public class TasksListsController {
         updateOwnerTaskListListView();
     }
 
-    private void updateOwnerTaskListListView() throws NullPointerException{
+    private void updateOwnerTaskListListView() throws NullPointerException {
         MainApplication.setCurrentArrayListTasksLists(ControllerDatabase.getOwnerTasksLists(MainApplication.getUser().getUserID()));
         if(MainApplication.getCurrentArrayListTasksLists() != null) {
             listViewTasksLists.getChildren().clear();
@@ -203,7 +203,7 @@ public class TasksListsController {
     }
 
     @FXML
-    public void showPopupWindowCreateTaskList(){
+    public void showPopupWindowCreateTaskList() {
         popup = new Popup();
         popup.setAutoHide(true);
         FlowPane flowPane = new FlowPane();
@@ -271,7 +271,7 @@ public class TasksListsController {
     }
 
     @FXML
-    public void closeWindow(){
+    public void closeWindow() {
         MainApplication.getStage().close();
     }
 }

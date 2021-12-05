@@ -90,13 +90,9 @@ public class MainApplication extends Application {
 
     public static TaskList getCurrentTaskList() { return currentTaskList; }
 
-    public static User getUser() {
-        return user;
-    }
+    public static User getUser() { return user; }
 
-    public static Stage getStage() {
-        return stage;
-    }
+    public static Stage getStage() { return stage; }
 
     public static void main(String[] args) {
         launch(args);

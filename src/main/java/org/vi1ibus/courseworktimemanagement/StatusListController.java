@@ -61,7 +61,7 @@ public class StatusListController {
             nameStatus.setTextAlignment(TextAlignment.CENTER);
             nameStatus.setTextFill(Color.WHITE);
             nameStatus.setWrapText(true);
-            nameStatus.setMaxWidth(anchorPane.getMaxWidth());
+            nameStatus.setMaxWidth(Double.MAX_VALUE);
             vBox.getChildren().add(nameStatus);
             VBox.setMargin(nameStatus, new Insets(5, 5, 5, 5));
             Label listTasks = new Label("List tasks:");
@@ -76,6 +76,7 @@ public class StatusListController {
                     nameTask.setStyle("-fx-border-color: #5999ff;");
                     nameTask.setTextAlignment(TextAlignment.JUSTIFY);
                     nameTask.setTextFill(Color.web("#5999ff"));
+                    nameTask.setMaxWidth(Double.MAX_VALUE);
                     vBox.getChildren().add(nameTask);
                     VBox.setMargin(nameTask, new Insets(2.5, 5, 5, 2.5));
                 }
@@ -140,18 +141,31 @@ public class StatusListController {
                     popupVBox.getChildren().addAll(nameTask, descriptionTask, btn, errMessage);
                     popup.getContent().addAll(popupVBox);
                     Bounds boundsInScreen = plus.localToScreen(plus.getLayoutBounds());
-                    popup.setX(boundsInScreen.getMinX() - 110 + plus.getFitWidth() / 2);
-                    popup.setY(boundsInScreen.getMinY() - 135);
+                    popup.setX(boundsInScreen.getMinX());
+                    popup.setY(boundsInScreen.getMinY() - 150 - controlPanel.getHeight() * 1.5);
                     popup.show(MainApplication.getStage());
                 }
             });
             ImageView minus = new ImageView(String.valueOf(MainApplication.class.getResource("img/minus.png")));
             minus.setFitHeight(25);
             minus.setFitWidth(25);
+            minus.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+
+                }
+            });
             AnchorPane.setLeftAnchor(minus, 25.0);
             ImageView blueCross = new ImageView(String.valueOf(MainApplication.class.getResource("img/blue-cross.png")));
-            blueCross.setFitWidth(15);
-            blueCross.setFitHeight(15);
+            blueCross.setFitWidth(20);
+            blueCross.setFitHeight(13);
+            blueCross.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    ControllerDatabase.deleteStatus(Integer.parseInt(gridPane.getId()));
+                    updateStatusListView();
+                }
+            });
             AnchorPane.setTopAnchor(blueCross, 6.0);
             AnchorPane.setRightAnchor(blueCross, 0.0);
             controlPanel.getChildren().add(plus);

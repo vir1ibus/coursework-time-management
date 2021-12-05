@@ -12,7 +12,7 @@ public class ControllerDatabase {
     private static Connection connection;
     private static PreparedStatement statement;
 
-    public static void connectDB() throws ClassNotFoundException, SQLException { connection = DriverManager.getConnection(url, username, password); }
+    public static void connectDB() throws SQLException { connection = DriverManager.getConnection(url, username, password); }
 
     public static User authenticationUser(String login, String password) {
         try {
@@ -24,7 +24,7 @@ public class ControllerDatabase {
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
             return new User(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(4));
-        } catch (SQLException | ClassNotFoundException e){
+        } catch (SQLException e){
             return null;
         }
     }
@@ -47,7 +47,7 @@ public class ControllerDatabase {
                 return 2;
             }
             return -1;
-        } catch (SQLException | ClassNotFoundException e){
+        } catch (SQLException e){
             return -1;
         }
     }
@@ -61,7 +61,7 @@ public class ControllerDatabase {
             statement.setInt(2, taskList.getEveryone());
             statement.setInt(3, taskList.getOwner());
             statement.executeUpdate();
-        } catch (SQLException | ClassNotFoundException e){
+        } catch (SQLException e){
             return;
         }
     }
@@ -94,7 +94,7 @@ public class ControllerDatabase {
                 statement.setInt(1, taskListId);
                 statement.executeUpdate();
             }
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -116,7 +116,7 @@ public class ControllerDatabase {
                 ));
             }
             return tasksLists;
-        } catch (SQLException | ClassNotFoundException e){
+        } catch (SQLException e){
             return null;
         }
     }
@@ -135,7 +135,7 @@ public class ControllerDatabase {
                     resultSet.getInt(4)
             );
 
-        } catch (SQLException | ClassNotFoundException e){
+        } catch (SQLException e){
             return null;
         }
     }
@@ -152,7 +152,7 @@ public class ControllerDatabase {
                 hashMap.put(String.valueOf(resultSet.getInt(1)), resultSet.getString(2));
             }
             return hashMap;
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
@@ -163,10 +163,10 @@ public class ControllerDatabase {
             connectDB();
             String query = "INSERT INTO statuses(name, tasks_list_id) VALUES (?, ?);";
             statement = connection.prepareStatement(query);
-            statement.setString(1, name);
+            statement.setString(1, name.trim());
             statement.setInt(2, MainApplication.getCurrentTaskList().getId());
             statement.executeUpdate();
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -175,7 +175,7 @@ public class ControllerDatabase {
         try {
             connectDB();
             HashMap<String, Task> hashMap = new HashMap<>();
-            String query = "SELECT * FROM task WHERE status_id=? AND tasks_list_id=?";
+            String query = "SELECT * FROM task WHERE status_id=? AND tasks_list_id=?;";
             statement = connection.prepareStatement(query);
             statement.setInt(1, Integer.parseInt(status));
             statement.setInt(2, MainApplication.getCurrentTaskList().getId());
@@ -190,7 +190,7 @@ public class ControllerDatabase {
                             ));
             }
             return hashMap;
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
@@ -214,7 +214,7 @@ public class ControllerDatabase {
                 arrayList.add(new Pair<>(resultStatusNames.getString(2), resultStatusCount.getInt(1)));
             }
             return arrayList;
-        } catch (SQLException | ClassNotFoundException e){
+        } catch (SQLException e){
             e.printStackTrace();
             return null;
         }
@@ -230,9 +230,36 @@ public class ControllerDatabase {
             statement.setString(3, description);
             statement.setInt(4, statusId);
             statement.executeUpdate();
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    public static void deleteTask(int taskId) {
+        try{
+            connectDB();
+            String query = "DELETE FROM task WHERE id=?;";
+            statement = connection.prepareStatement(query);
+            statement.setInt(1, taskId);
+            statement.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteStatus(int statusId) {
+        try {
+            connectDB();
+            String query = "DELETE FROM task WHERE status_id=?;";
+            statement = connection.prepareStatement(query);
+            statement.setInt(1, statusId);
+            statement.executeUpdate();
+            query = "DELETE FROM statuses WHERE id=?;";
+            statement = connection.prepareStatement(query);
+            statement.setInt(1, statusId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

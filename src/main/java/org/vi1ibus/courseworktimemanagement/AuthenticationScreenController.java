@@ -93,10 +93,13 @@ public class AuthenticationScreenController {
                         } else {
                             switch (ControllerDatabase.registrationUser(input_login.getText(), get_SHA_512_SecurePassword(input_password.getText()), input_email.getText())) {
                                 case 0:
-                                    FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("login-screen-view.fxml"));
-                                    Scene scene = new Scene(fxmlLoader.load());
-                                    MainApplication.setDraggable(scene);
-                                    MainApplication.getStage().setScene(scene);
+                                    MainApplication.setUser(ControllerDatabase.authenticationUser(input_login.getText(), get_SHA_512_SecurePassword(input_password.getText())));
+                                    if(MainApplication.getUser() != null) {
+                                        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("task-list-view.fxml"));
+                                        Scene scene = new Scene(fxmlLoader.load());
+                                        MainApplication.setDraggable(scene);
+                                        MainApplication.getStage().setScene(scene);
+                                    }
                                     break;
                                 case 1:
                                     output_error_message.setText("Login already exists.");
