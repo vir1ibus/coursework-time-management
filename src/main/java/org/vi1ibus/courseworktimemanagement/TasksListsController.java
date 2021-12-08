@@ -122,11 +122,11 @@ public class TasksListsController {
                             ArrayList<Pair<String, Integer>> statuses = ControllerDatabase.getCountTaskListStatuses(taskList.getId());
                             if(!statuses.isEmpty()) {
                                 for (Pair<String, Integer> status : statuses) {
-                                    Label name = new Label(status.getKey() + ":");
+                                    Label name = new Label(status.getKey().trim() + ":");
                                     name.setStyle("-fx-padding: 2px;\n" +
                                             "-fx-border-insets: 2px;\n" +
                                             "-fx-background-insets: 2px;");
-                                    Label count = new Label(String.valueOf(status.getValue()));
+                                    Label count = new Label(String.valueOf(status.getValue()).trim());
                                     count.setStyle("-fx-padding: 2px;\n" +
                                             "-fx-border-insets: 2px;\n" +
                                             "-fx-background-insets: 2px;");

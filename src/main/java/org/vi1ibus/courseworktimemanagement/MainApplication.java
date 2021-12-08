@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -32,6 +33,12 @@ public class MainApplication extends Application {
         stage.setScene(scene);
         stage.initStyle(StageStyle.UNDECORATED);
         stage.show();
+    }
+
+
+
+    public static URL getFxmlForTests(String filename) {
+        return MainApplication.class.getResource(filename);
     }
 
     public static void setDraggable(Scene scene){
@@ -93,6 +100,8 @@ public class MainApplication extends Application {
     public static User getUser() { return user; }
 
     public static Stage getStage() { return stage; }
+
+    public static void setStage(Stage stage) { MainApplication.stage = stage; }
 
     public static void main(String[] args) {
         launch(args);
